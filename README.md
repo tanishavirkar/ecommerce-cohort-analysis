@@ -123,10 +123,7 @@ Start a simple HTTP server to render the dashboard:
 ```bash
 python -m http.server 8000
 ```
-Open your browser and navigate to: **[http://localhost:8000](http://localhost:8000)**
+Open  browser and navigate to: **[http://localhost:8000](http://localhost:8000)**
 
 ---
 
-## 📈 Portfolio Presentation Tips
-* **SQL Highlight**: Use the dashboard's built-in **SQL Query Engine** tab in interviews to walk hiring managers through your SQL optimization steps (e.g. index selection, query partitioning).
-* **Strategic Business Alignment**: Explain the *why* behind the numbers. Highlight that although retention is low, identifying the 1.5% repeat buyers and targeting them can yield a 5x lower acquisition expense compared to cold ads.
