@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Cohort & Retention Dashboard (Olist Dataset)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Prism.js for SQL Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <!-- Vanilla CSS Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon"><i data-lucide="bar-chart-3"></i></div>
+                <div class="logo-text">
+                    <h2>Retentify</h2>
+                    <span>Cohort Analytics</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="#overview" class="active"><i data-lucide="layout-dashboard"></i> Overview Dashboard</a>
+                <a href="#heatmap-section"><i data-lucide="grid"></i> Retention Heatmap</a>
+                <a href="#financials"><i data-lucide="dollar-sign"></i> Financial Performance</a>
+                <a href="#sql-queries"><i data-lucide="database"></i> SQL Query Engine</a>
+            </nav>
+            <div class="user-profile">
+                <div class="avatar"><i data-lucide="user"></i></div>
+                <div class="profile-info">
+                    <strong>Tanisha Virkar</strong>
+                    <span>Data Analyst</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-title">
+                    <h1>Brazilian E-Commerce Cohort & Retention Analysis</h1>
+                    <p>Analytical dashboard compiled from 100,000 anonymized Olist transactions (2016-2018)</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="window.print()"><i data-lucide="download"></i> Export PDF</button>
+                    <a href="https://github.com" target="_blank" class="btn btn-primary"><i data-lucide="github"></i> View Repository</a>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                
+                <!-- KPI Summary Row -->
+                <div class="kpi-row">
+                    <div class="kpi-card glass">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Total Unique Customers</span>
+                            <div class="kpi-icon"><i data-lucide="users"></i></div>
+                        </div>
+                        <div class="kpi-value" id="kpi-customers">0</div>
+                        <div class="kpi-footer">
+                            <span class="trend-neutral"><i data-lucide="activity"></i> Total Lifespan Count</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card glass">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Avg Month 1 Retention</span>
+                            <div class="kpi-icon"><i data-lucide="refresh-cw"></i></div>
+                        </div>
+                        <div class="kpi-value" id="kpi-retention">0.00%</div>
+                        <div class="kpi-footer">
+                            <span class="trend-negative"><i data-lucide="alert-triangle"></i> High marketplace churn</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Total Lifetime Revenue</span>
+                            <div class="kpi-icon"><i data-lucide="dollar-sign"></i></div>
+                        </div>
+                        <div class="kpi-value" id="kpi-revenue">$0.00</div>
+                        <div class="kpi-footer">
+                            <span class="trend-positive"><i data-lucide="trending-up"></i> Invoiced order values</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Overall Average Order Value (AOV)</span>
+                            <div class="kpi-icon"><i data-lucide="shopping-bag"></i></div>
+                        </div>
+                        <div class="kpi-value" id="kpi-aov">$0.00</div>
+                        <div class="kpi-footer">
+                            <span class="trend-neutral"><i data-lucide="hash"></i> Per customer cart total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Summary / Callout -->
+                <section class="glass alert-box">
+                    <div class="alert-icon"><i data-lucide="info"></i></div>
+                    <div class="alert-body">
+                        <h4>Key Analyst Insight: Why is Retention Low?</h4>
+                        <p>In retail marketplaces like Olist, repeat purchase rates are typically low (avg. 1-2% in Month 1) due to single-purchase consumer behaviors (e.g., household electronics, furniture). This highlights a critical business recommendation: shifting marketing spend from expensive acquisition channels to post-purchase engagement campaign triggers (e.g. customized coupons or loyalty rewards) in order to build long-term repeat cohort value.</p>
+                    </div>
+                </section>
+
+                <!-- Retention Heatmap Section -->
+                <section id="heatmap-section" class="card glass">
+                    <div class="card-header">
+                        <div class="card-info">
+                            <h3>Cohort Retention Matrix</h3>
+                            <p>Tracks percentage of unique returning customers month-over-month</p>
+                        </div>
+                        <div class="card-controls">
+                            <div class="toggle-group">
+                                <button class="toggle-btn active" id="toggle-percent">Percentage (%)</button>
+                                <button class="toggle-btn" id="toggle-count">Raw Counts</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="heatmap-wrapper">
+                        <div class="heatmap-container" id="cohort-heatmap">
+                            <!-- JS will inject the table here -->
+                            <div class="loading-spinner">Loading heatmap data...</div>
+                        </div>
+                    </div>
+                    <!-- Heatmap Legend -->
+                    <div class="heatmap-legend">
+                        <span>Retention Scale:</span>
+                        <div class="legend-scale">
+                            <span class="legend-box" style="background: rgba(147, 51, 234, 0.05)">0%</span>
+                            <span class="legend-box" style="background: rgba(147, 51, 234, 0.2)">0.5%</span>
+                            <span class="legend-box" style="background: rgba(147, 51, 234, 0.4)">1.0%</span>
+                            <span class="legend-box" style="background: rgba(147, 51, 234, 0.7)">2.0%</span>
+                            <span class="legend-box" style="background: rgba(147, 51, 234, 1.0)">>3.0%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <div class="charts-row">
+                    <section id="financials" class="card glass chart-card">
+                        <h3>Cohort Retention Churn Curve</h3>
+                        <p>Decay trend of returning customer percentage across subsequent periods</p>
+                        <div class="chart-container">
+                            <canvas id="retentionDecayChart"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="card glass chart-card">
+                        <h3>Monthly Orders & Revenue Trends</h3>
+                        <p>Total transaction counts and volume month-over-month</p>
+                        <div class="chart-container">
+                            <canvas id="monthlyTrendsChart"></canvas>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Secondary Analysis Section (Geo & Category) -->
+                <div class="charts-row">
+                    <section class="card glass table-card">
+                        <h3>Top 10 Product Categories by Repeat Purchases</h3>
+                        <p>Identifies product lines driving repeat client engagement</p>
+                        <table class="data-table" id="category-table">
+                            <thead>
+                                <tr>
+                                    <th>Category (English)</th>
+                                    <th>Repeat Customers</th>
+                                    <th>Total Orders</th>
+                                    <th>Sales Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS will inject rows here -->
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section class="card glass table-card">
+                        <h3>Top 10 States by Customer Volume</h3>
+                        <p>Distribution of sales and client volumes across Brazil states</p>
+                        <table class="data-table" id="geo-table">
+                            <thead>
+                                <tr>
+                                    <th>State Code</th>
+                                    <th>Customer Count</th>
+                                    <th>Total Payment Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS will inject rows here -->
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+
+                <!-- SQL Query Engine Panel (Job Portfolio highlight) -->
+                <section id="sql-queries" class="card glass sql-section">
+                    <div class="card-header">
+                        <div class="card-info">
+                            <h3><i data-lucide="database" class="header-icon"></i> SQL Query Reference Engine</h3>
+                            <p>Recruiter-facing reference showing the SQLite queries executed to compute the cohort tables</p>
+                        </div>
+                    </div>
+                    
+                    <div class="sql-tabs-container">
+                        <div class="sql-sidebar">
+                            <button class="sql-tab active" onclick="switchSqlTab(event, 'sql-retention')">Cohort Retention Matrix</button>
+                            <button class="sql-tab" onclick="switchSqlTab(event, 'sql-financials')">Cohort Revenue & AOV</button>
+                            <button class="sql-tab" onclick="switchSqlTab(event, 'sql-categories')">Category Repeat Purchases</button>
+                            <button class="sql-tab" onclick="switchSqlTab(event, 'sql-geo')">Geographic Distribution</button>
+                        </div>
+                        
+                        <div class="sql-content-pane">
+                            <!-- Cohort Retention SQL -->
+                            <div id="sql-retention" class="sql-code-block active">
+                                <pre><code class="language-sql">-- 1. Identify Customer's First Order Month
+WITH customer_cohorts AS (
+    SELECT
+        c.customer_unique_id,
+        MIN(strftime('%Y-%m', o.order_purchase_timestamp)) AS cohort_month
+    FROM olist_orders_dataset o
+    JOIN olist_customers_dataset c ON o.customer_id = c.customer_id
+    WHERE o.order_status NOT IN ('canceled', 'unavailable')
+    GROUP BY c.customer_unique_id
+),
+-- 2. Build All Customer Orders with purchase Month
+customer_orders AS (
+    SELECT
+        c.customer_unique_id,
+        o.order_id,
+        strftime('%Y-%m', o.order_purchase_timestamp) AS order_month
+    FROM olist_orders_dataset o
+    JOIN olist_customers_dataset c ON o.customer_id = c.customer_id
+    WHERE o.order_status NOT IN ('canceled', 'unavailable')
+),
+-- 3. Calculate Cohort Indices (Months elapsed since first order)
+order_cohort_indices AS (
+    SELECT
+        o.customer_unique_id,
+        co.cohort_month,
+        o.order_month,
+        (cast(substr(o.order_month, 1, 4) as integer) - cast(substr(co.cohort_month, 1, 4) as integer)) * 12 +
+        (cast(substr(o.order_month, 6, 2) as integer) - cast(substr(co.cohort_month, 6, 2) as integer)) AS cohort_index
+    FROM customer_orders o
+    JOIN customer_cohorts co ON o.customer_unique_id = co.customer_unique_id
+),
+-- 4. Calculate Size of Each Cohort
+cohort_sizes AS (
+    SELECT cohort_month, COUNT(DISTINCT customer_unique_id) as cohort_size
+    FROM customer_cohorts
+    GROUP BY cohort_month
+)
+-- 5. Combine and Aggregate Retention Percentages
+SELECT
+    oci.cohort_month,
+    cs.cohort_size,
+    oci.cohort_index,
+    COUNT(DISTINCT oci.customer_unique_id) AS active_customers
+FROM order_cohort_indices oci
+JOIN cohort_sizes cs ON oci.cohort_month = cs.cohort_month
+WHERE oci.cohort_index >= 0
+GROUP BY oci.cohort_month, oci.cohort_index
+ORDER BY oci.cohort_month, oci.cohort_index;</code></pre>
+                            </div>
+
+                            <!-- Cohort Financials SQL -->
+                            <div id="sql-financials" class="sql-code-block">
+                                <pre><code class="language-sql">-- Calculate Cohort Revenue, Average Order Value (AOV) and Order counts
+WITH customer_cohorts AS (
+    SELECT
+        c.customer_unique_id,
+        MIN(strftime('%Y-%m', o.order_purchase_timestamp)) AS cohort_month
+    FROM olist_orders_dataset o
+    JOIN olist_customers_dataset c ON o.customer_id = c.customer_id
+    WHERE o.order_status NOT IN ('canceled', 'unavailable')
+    GROUP BY c.customer_unique_id
+),
+customer_orders AS (
+    SELECT
+        c.customer_unique_id,
+        o.order_id,
+        strftime('%Y-%m', o.order_purchase_timestamp) AS order_month
+    FROM olist_orders_dataset o
+    JOIN olist_customers_dataset c ON o.customer_id = c.customer_id
+    WHERE o.order_status NOT IN ('canceled', 'unavailable')
+),
+order_payments AS (
+    SELECT order_id, SUM(payment_value) as order_payment_val
+    FROM olist_order_payments_dataset
+    GROUP BY order_id
+),
+order_financial_indices AS (
+    SELECT
+        o.customer_unique_id,
+        o.order_id,
+        co.cohort_month,
+        o.order_month,
+        p.order_payment_val,
+        (cast(substr(o.order_month, 1, 4) as integer) - cast(substr(co.cohort_month, 1, 4) as integer)) * 12 +
+        (cast(substr(o.order_month, 6, 2) as integer) - cast(substr(co.cohort_month, 6, 2) as integer)) AS cohort_index
+    FROM customer_orders o
+    JOIN customer_cohorts co ON o.customer_unique_id = co.customer_unique_id
+    JOIN order_payments p ON o.order_id = p.order_id
+),
+cohort_sizes AS (
+    SELECT cohort_month, COUNT(DISTINCT customer_unique_id) as cohort_size
+    FROM customer_cohorts
+    GROUP BY cohort_month
+)
+SELECT
+    ofi.cohort_month,
+    cs.cohort_size,
+    ofi.cohort_index,
+    SUM(ofi.order_payment_val) as total_revenue,
+    AVG(ofi.order_payment_val) as avg_order_value,
+    COUNT(ofi.order_id) as total_orders
+FROM order_financial_indices ofi
+JOIN cohort_sizes cs ON ofi.cohort_month = cs.cohort_month
+WHERE ofi.cohort_index >= 0
+GROUP BY ofi.cohort_month, ofi.cohort_index
+ORDER BY ofi.cohort_month, ofi.cohort_index;</code></pre>
+                            </div>
+
+                            <!-- Category SQL -->
+                            <div id="sql-categories" class="sql-code-block">
+                                <pre><code class="language-sql">-- Query top 10 categories driving repeat customers and total sales volume
+SELECT
+    COALESCE(t.product_category_name_english, p.product_category_name) as category,
+    COUNT(DISTINCT o.customer_unique_id) as repeat_customers,
+    COUNT(o.order_id) as total_orders,
+    SUM(i.price) as total_sales
+FROM olist_order_items_dataset i
+JOIN customer_orders o ON i.order_id = o.order_id
+JOIN olist_products_dataset p ON i.product_id = p.product_id
+LEFT JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+GROUP BY category
+ORDER BY repeat_customers DESC
+LIMIT 10;</code></pre>
+                            </div>
+
+                            <!-- Geo SQL -->
+                            <div id="sql-geo" class="sql-code-block">
+                                <pre><code class="language-sql">-- Identify geographical sales concentrations across Brazilian states
+SELECT
+    customer_state as state,
+    COUNT(DISTINCT customer_unique_id) as total_customers,
+    SUM(payment_value) as state_revenue
+FROM customer_orders o
+JOIN olist_order_payments_dataset p ON o.order_id = p.order_id
+GROUP BY state
+ORDER BY total_customers DESC
+LIMIT 10;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
